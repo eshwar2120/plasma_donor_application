@@ -42,14 +42,19 @@ def signup():
         roll_no = request.form['roll_no']
         sex = request.form['sex']
         age = request.form['age']
-        address = request.fomr['address']
-        blood_group = request.fomr['blood_group']
-        sql = "insert into user values(?,?,?,?)"
+        address = request.form['address']
+        blood_group = request.form['blood_group']
+        sql = "insert into user values(?,?,?,?,?,?,?,?,?)"
         prep_stmt = ibm_db.prepare(conn,sql)
-        ibm_db.bind_param(prep_stmt,1,email)
-        ibm_db.bind_param(prep_stmt,2,username)
-        ibm_db.bind_param(prep_stmt,3,roll_no)
-        ibm_db.bind_param(prep_stmt,4,password)
+        ibm_db.bind_param(prep_stmt,1,username)
+        ibm_db.bind_param(prep_stmt,2,email)
+        ibm_db.bind_param(prep_stmt,3,password)
+        ibm_db.bind_param(prep_stmt,4,roll_no)
+        ibm_db.bind_param(prep_stmt,5,sex)
+        ibm_db.bind_param(prep_stmt,6, age)
+        ibm_db.bind_param(prep_stmt,7, "USER")
+        ibm_db.bind_param(prep_stmt,8, address)
+        ibm_db.bind_param(prep_stmt,9, blood_group)
         ibm_db.execute(prep_stmt)
         #db post operation
         return redirect(url_for('login'))
