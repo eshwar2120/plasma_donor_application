@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        function functio()
+        {
+            var username = document.getElementById("username").value;
+            var role = document.getElementById("role").value;
+            if(role=="USER")
+            {role ="DONOR"}
+            else
+            {
+              role="USER"
+            }
+            var data =
+                {"username":username,
+                "role":role}
+            
+      $.ajax(
+        {   contentType: 'application/json;charset=UTF-8',
+            type:'POST',
+            headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    
+            url:"http://100.127.73.5:5000/toggle",
+            data:JSON.stringify(data),
+            
+            ContentType:'application/json',
+            success:function(result)
+            {
+            console.log(result['status'])
+            document.getElementById("result").innerText = result['role'];
+            document.getElementById('role').value=result['role'];
+            }
+        }
+      )
+  
+        }
+
+//         $("body").on("change", "#listcity01", function() {
+//       alert("the selected value is:" + $(this).val());
+// });
+
+
+    </script>
+    <link href="../static/dashboard.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    
+</head>
+<body>
+    <label class="switch">
+    <form>
+    <input type="hidden" id="username" name="username" value="{{username}}">
+        <input type="hidden" id="role" name="role" value="{{role}}">
+        
+        <input type="checkbox" id="toggle" onchange="functio()" value="user">
+        <span class="slider round"></span>
+      </label>
+
+    </form>
+      <h1 id="result"></h1>
+</body>
+</html>
