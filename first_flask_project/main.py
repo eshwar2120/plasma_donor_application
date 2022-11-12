@@ -6,7 +6,9 @@ conn = ibm_db.connect("DATABASE=bludb;HOSTNAME=764264db-9824-4b7c-82df-40d1b1389
 print(conn)
 print("connection successful...")
 app = Flask(__name__)
-
+import os
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 
 
 
@@ -116,14 +118,33 @@ def requestBloodPlasma():
     age = request.form['age']
     sex = request.form['sex']
     blood_type = request.form['bloodtype']
+    phone_number = request.form['phone_num']
     sql = "select email from user where blood_group=?"
     stmt = ibm_db.prepare(conn, sql)
     ibm_db.bind_param(stmt, 1, blood_type)
     ibm_db.execute(stmt)
     dic = ibm_db.fetch_assoc(stmt)
+    email_list = []
     while dic!=False:
-        print(dic['email'])
+        email_list.append(dic['EMAIL'])
+        print(dic['EMAIL'])
+        dic = ibm_db.fetch_assoc(stmt)
     #send mail
+
+    message = Mail(
+        from_email='eshwaran.s.2019.cse@rajalakshmi.edu.in',
+        to_emails=email_list,
+        subject='Sending with Twilio SendGrid is Fun',
+        html_content='<h1>Need Of Blood</h1><table><tr><th>Name</th><th>'+name+'</th></tr><tr><th>Age</th><th>'+age+'</th></tr><tr><th>Sex</th><th>'+sex+'</th></tr><tr><th>Blood Group</th><th>'+blood_type+'</th></tr><tr><th>Phone Number</th><th>'+phone_number+'</th></tr></table>'
+                     )
+    try:
+        sg = SendGridAPIClient("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")
+        response = sg.send(message)
+        print(response.status_code)
+        print(response.body)
+        print(response.headers)
+    except Exception as e:
+        print(e.message)
     #insert data into requests table
     sql = "insert into bloodrequests(username,name,age,sex,blood_type) values (?,?,?,?,?)"
     prep_stmt = ibm_db.prepare(conn, sql)
