@@ -5,7 +5,7 @@ import json
 conn = ibm_db.connect("DATABASE=bludb;HOSTNAME=764264db-9824-4b7c-82df-40d1b13897c2.bs2io90l08kqb1od8lcg.databases.appdomain.cloud;PORT=32536;SECURITY=SSL;SSLServerCertificate=abc.crt;UID=gnq12618;PWD=0glS4tFaR2ciK8fB",'','')
 print(conn)
 print("connection successful...")
-app = Flask(__name__)
+app = Flask(__name__,template_folder='template')
 
 
 
@@ -20,6 +20,7 @@ def dash():
 
 @app.route('/login',methods=['POST','GET'])
 def login():
+    
     if request.method=='POST':
         username = request.form['username']
         password = request.form['password']
@@ -56,10 +57,12 @@ def login():
 
 
         else:
+            
             return render_template('login.html')
         return redirect(url_for('home'))
-    elif request.method=='GET':
-        return render_template('login.html')
+    else:
+       print("else")
+       return render_template('login.html')
 
 @app.route('/signup',methods=['POST','GET'])
 def signup():
@@ -145,14 +148,16 @@ def requestBloodPlasma():
 
 @app.route('/getrequests',methods=['POST'])
 def getBloodRequests():
-    username = request.form['username']
+    data =  request.get_json(force=True) 
+    
+    username =data['username']
     sql = "select * from bloodrequests where username=?"
     stmt = ibm_db.prepare(conn, sql)
     ibm_db.bind_param(stmt, 1, username)
     ibm_db.execute(stmt)
     dic = ibm_db.fetch_assoc(stmt)
     requests = []
-    print(type(dic))
+    print(dic)
     while dic != False:
         single_request = {
             'name':dic['NAME'],
