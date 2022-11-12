@@ -32,32 +32,33 @@ def login():
         ibm_db.execute(stmt)
         dic = ibm_db.fetch_assoc(stmt)
         print(dic)
-        role = str()
+        
         requests = []
         if dic:
             role = dic['ROLE']
-            sql = "select * from user where blood_group=?"
-            stmt = ibm_db.prepare(conn, sql)
-            ibm_db.bind_param(stmt, 1, username)
-            ibm_db.execute(stmt)
-            dic = ibm_db.fetch_assoc(stmt)
+            # sql = "select * from user where blood_group=?"
+            # stmt = ibm_db.prepare(conn, sql)
+            # ibm_db.bind_param(stmt, 1, username)
+            # ibm_db.execute(stmt)
+            # dic = ibm_db.fetch_assoc(stmt)
 
 
-            while dic != False:
-                single_request = {
-                    'name': dic['NAME'],
-                    'age': dic['AGE'],
-                    'sex': dic['SEX'],
-                    'blood_type': dic['BLOOD_TYPE']
-                }
-                print(single_request)
-                requests.append(single_request)
-                dic = ibm_db.fetch_assoc(stmt)
+            # while dic != False:
+            #     single_request = {
+            #         'name': dic['NAME'],
+            #         'age': dic['AGE'],
+            #         'sex': dic['SEX'],
+            #         'blood_type': dic['BLOOD_TYPE']
+            #     }
+            #     print(single_request)
+            #     requests.append(single_request)
+                # dic = ibm_db.fetch_assoc(stmt)
+            
             return render_template('dashboard.html',username=username,role=role)
 
 
         else:
-            return redirect(url_for('login'))
+            return render_template('login.html')
         return redirect(url_for('home'))
     elif request.method=='GET':
         return render_template('login.html')
@@ -110,7 +111,7 @@ def toggle_user():
         role = role
     )
 
-@app.route('/requestPalsma',methods=['POST'])
+@app.route('/requestPlasma',methods=['POST'])
 def requestBloodPlasma():
     #fetch mail address of the donors
     username = request.form['username']
