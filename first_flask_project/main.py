@@ -1,9 +1,8 @@
-from flask import Flask,redirect,url_for,render_template,request,make_response,jsonify,request
+import json
+import os
+
 import ibm_db
 from flask import request
-import os
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
 import json
 conn = ibm_db.connect("DATABASE=bludb;HOSTNAME=764264db-9824-4b7c-82df-40d1b13897c2.bs2io90l08kqb1od8lcg.databases.appdomain.cloud;PORT=32536;SECURITY=SSL;SSLServerCertificate=abc.crt;UID=gnq12618;PWD=0glS4tFaR2ciK8fB",'','')
 print(conn)
@@ -17,24 +16,26 @@ app = Flask(__name__,template_folder='template')
 def home():
     return render_template("landing.html")
 
+
 @app.route('/home')
 def dash():
     return render_template("dashboard.html")
 
-@app.route('/login',methods=['POST','GET'])
+
+@app.route('/login', methods=['POST', 'GET'])
 def login():
     print("login")
     if request.method=='POST':
         username = request.form['username']
         password = request.form['password']
         sql = "select * from user where username=? and password=?"
-        stmt = ibm_db.prepare(conn,sql)
-        ibm_db.bind_param(stmt,1,username)
+        stmt = ibm_db.prepare(conn, sql)
+        ibm_db.bind_param(stmt, 1, username)
         ibm_db.bind_param(stmt, 2, password)
         ibm_db.execute(stmt)
         dic = ibm_db.fetch_assoc(stmt)
         print(dic)
-        
+        role = str()
         requests = []
         if dic:
             role = dic['ROLE']
@@ -43,7 +44,6 @@ def login():
             # ibm_db.bind_param(stmt, 1, username)
             # ibm_db.execute(stmt)
             # dic = ibm_db.fetch_assoc(stmt)
-
 
             # while dic != False:
             #     single_request = {
@@ -54,9 +54,8 @@ def login():
             #     }
             #     print(single_request)
             #     requests.append(single_request)
-                # dic = ibm_db.fetch_assoc(stmt)
-            
-            return render_template('dashboard.html',username=username,role=role)
+            #     dic = ibm_db.fetch_assoc(stmt)
+            return render_template('dashboard.html', username=username, role=role)
 
 
         else:
@@ -67,9 +66,10 @@ def login():
        print("else")
        return render_template('login.html')
 
-@app.route('/signup',methods=['POST','GET'])
+
+@app.route('/signup', methods=['POST', 'GET'])
 def signup():
-    if request.method=='POST':
+    if request.method == 'POST':
         username = request.form['username']
         email = request.form['email']
         password = request.form['password']
@@ -79,29 +79,28 @@ def signup():
         address = request.form['address']
         blood_group = request.form['blood_group']
         sql = "insert into user values(?,?,?,?,?,?,?,?,?)"
-        prep_stmt = ibm_db.prepare(conn,sql)
-        ibm_db.bind_param(prep_stmt,1,username)
-        ibm_db.bind_param(prep_stmt,2,email)
-        ibm_db.bind_param(prep_stmt,3,password)
-        ibm_db.bind_param(prep_stmt,4,roll_no)
-        ibm_db.bind_param(prep_stmt,5,sex)
-        ibm_db.bind_param(prep_stmt,6, age)
-        ibm_db.bind_param(prep_stmt,7, "USER")
-        ibm_db.bind_param(prep_stmt,8, address)
-        ibm_db.bind_param(prep_stmt,9, blood_group)
+        prep_stmt = ibm_db.prepare(conn, sql)
+        ibm_db.bind_param(prep_stmt, 1, username)
+        ibm_db.bind_param(prep_stmt, 2, email)
+        ibm_db.bind_param(prep_stmt, 3, password)
+        ibm_db.bind_param(prep_stmt, 4, roll_no)
+        ibm_db.bind_param(prep_stmt, 5, sex)
+        ibm_db.bind_param(prep_stmt, 6, age)
+        ibm_db.bind_param(prep_stmt, 7, "USER")
+        ibm_db.bind_param(prep_stmt, 8, address)
+        ibm_db.bind_param(prep_stmt, 9, blood_group)
         ibm_db.execute(prep_stmt)
-        #db post operation
+        # db post operation
         return redirect(url_for('login'))
-    elif request.method=='GET':
+    elif request.method == 'GET':
         return render_template('signup.html')
 
-@app.route('/toggle',methods=['POST'])
+
+@app.route('/toggle', methods=['POST'])
 def toggle_user():
-    
-   
-    data =  request.get_json(force=True) 
-    
-    username =data['username']
+    data = request.get_json(force=True)
+
+    username = data['username']
     role = data['role']
     print(username)
     print(role)
@@ -111,11 +110,12 @@ def toggle_user():
     ibm_db.bind_param(prep_stmt, 2, username)
     ibm_db.execute(prep_stmt)
     return jsonify(
-        status = "success",
-        role = role
+        status="success",
+        role=role
     )
 
-@app.route('/requestPlasma',methods=['POST'])
+
+@app.route('/requestPalsma', methods=['POST'])
 def requestBloodPlasma():
     #fetch mail address of the donors
     data =  request.get_json(force=True) 
@@ -165,14 +165,15 @@ def requestBloodPlasma():
     ibm_db.execute(prep_stmt)
 
     return jsonify(
-        name = name,
-        age = age,
-        sex = sex,
-        bloodtype = blood_type,
-        status = "yes"
+        name=name,
+        age=age,
+        sex=sex,
+        bloodtype=blood_type,
+        status="yes"
     )
 
-@app.route('/getrequests',methods=['POST'])
+
+@app.route('/getrequests', methods=['POST'])
 def getBloodRequests():
     data =  request.get_json(force=True) 
     
@@ -186,21 +187,22 @@ def getBloodRequests():
     print(dic)
     while dic != False:
         single_request = {
-            'name':dic['NAME'],
-            'age':dic['AGE'],
-            'sex':dic['SEX'],
-            'blood_type':dic['BLOOD_TYPE']
+            'name': dic['NAME'],
+            'age': dic['AGE'],
+            'sex': dic['SEX'],
+            'blood_type': dic['BLOOD_TYPE']
         }
         print(single_request)
         requests.append(single_request)
         dic = ibm_db.fetch_assoc(stmt)
     return jsonify(
-        username = username,
-        requests = requests
+        username=username,
+        requests=requests
     )
 @app.route('/form')
 def form():
     return render_template("form.html")
+
 
 if __name__=='__main__':
     app.run(host="0.0.0.0",debug = True)
