@@ -25,11 +25,11 @@
       background-color: #DFDFDF;
   }
   body{
-      background-color: beige;
+      background-color: rgb(240, 240, 240);
       margin: 35px 30px 0px 30px;
       
       min-height: 1024px;
-      overflow: hidden;
+      overflow:hidden;
       font-family: 'Poppins', sans-serif;
   }
   .btn{
@@ -46,7 +46,8 @@
           border: 1px solid #ff5353;
           color: white;
         }
-  
+
+ 
   img{
     
     width: 100%;
@@ -79,10 +80,10 @@
   <body >
     
 <div class="side-bar">
-  <a id="a"  class="active">Hi🖐{{username}}!</a>
-  <a id="a">Home</a>
-  <a  id="a">Request Plasma</a>
-  <a id="a" onclick="myhistory()">My Reqeust</a>
+  <a id="a" href="#"  class="active">Hi🖐{{username}}!</a>
+  <a id="a home" href="#" onclick="home()">Home</a>
+  <a  id="a" href="#" onclick="request()">Request Plasma</a>
+  <a id="a" href="#" onclick="myhistory()">My Reqeust</a>
   <a href="#about">About</a>
 </div>
 <nav class="nav nav-2">
@@ -93,7 +94,7 @@
       <input type="hidden" id="username" name="username" value="{{username}}">
           <input type="hidden" id="role" name="role" value="{{role}}">
           
-          <input type="checkbox" id="toggle" onchange="functio()" value="user">
+         <input type="checkbox" id="toggle" onchange="functio()" >
           <span class="slider round"></span>
         </label>
   
@@ -124,6 +125,11 @@
     <p>Blood : A- <br>Location Kerala<br>Contact 982376312</p>
    
   </div>
+  <div class="box orange">
+    <h2>Suresh</h2>
+    <p>Blood : A+ <br>Location Chennai<br>Contact 982376312</p>
+    
+  </div>
 </div>
 <div class="row1-container">
   <div class="box orange">
@@ -141,6 +147,11 @@
     <h2>Vikram</h2>
     <p>Blood : O- <br>Location Mumbai<br>Contact 682376356</p>
    
+  </div>
+  <div class="box  cyan">
+    <h2>Suresh</h2>
+    <p>Blood : O+ <br>Location Chennai<br>Contact 982376312</p>
+    
   </div>
 </div>
 </div>

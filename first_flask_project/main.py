@@ -1,6 +1,9 @@
 from flask import Flask,redirect,url_for,render_template,request,make_response,jsonify,request
 import ibm_db
 from flask import request
+import os
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 import json
 conn = ibm_db.connect("DATABASE=bludb;HOSTNAME=764264db-9824-4b7c-82df-40d1b13897c2.bs2io90l08kqb1od8lcg.databases.appdomain.cloud;PORT=32536;SECURITY=SSL;SSLServerCertificate=abc.crt;UID=gnq12618;PWD=0glS4tFaR2ciK8fB",'','')
 print(conn)
@@ -20,7 +23,7 @@ def dash():
 
 @app.route('/login',methods=['POST','GET'])
 def login():
-    
+    print("login")
     if request.method=='POST':
         username = request.form['username']
         password = request.form['password']
@@ -115,19 +118,42 @@ def toggle_user():
 @app.route('/requestPlasma',methods=['POST'])
 def requestBloodPlasma():
     #fetch mail address of the donors
-    username = request.form['username']
-    name = request.form['name']
-    age = request.form['age']
-    sex = request.form['sex']
-    blood_type = request.form['bloodtype']
+    data =  request.get_json(force=True) 
+    username = data['username']
+    name = data['name']
+    age = data['age']      
+    sex = data['sex']
+    phone_number = data['phno']
+    blood_type = data['blood']
     sql = "select email from user where blood_group=?"
     stmt = ibm_db.prepare(conn, sql)
     ibm_db.bind_param(stmt, 1, blood_type)
     ibm_db.execute(stmt)
     dic = ibm_db.fetch_assoc(stmt)
-    while dic!=False:
-        print(dic['email'])
+    
     #send mail
+    email_list = []
+    while dic != False:
+        email_list.append(dic['EMAIL'])
+        print(dic['EMAIL'])
+        dic = ibm_db.fetch_assoc(stmt)
+    # send mail
+    print(email_list)
+    message = Mail(
+        from_email='eshwaran.s.2019.cse@rajalakshmi.edu.in',
+        to_emails=email_list,
+        subject='Blood Need',
+        html_content='<h1>Need Of Blood</h1><table><tr><th>Name</th><th>' + name + '</th></tr><tr><th>Age</th><th>' + age + '</th></tr><tr><th>Sex</th><th>' + sex + '</th></tr><tr><th>Blood Group</th><th>' + blood_type + '</th></tr><tr><th>Phone Number</th><th>' + phone_number + '</th></tr></table>'
+    )
+    try:
+        sg = SendGridAPIClient("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")
+        response = sg.send(message)
+        print(response.status_code)
+        print(response.body)
+        print(response.headers)
+    except Exception as e:
+        print(e.message)
+    # insert data into requests table
     #insert data into requests table
     sql = "insert into bloodrequests(username,name,age,sex,blood_type) values (?,?,?,?,?)"
     prep_stmt = ibm_db.prepare(conn, sql)
@@ -172,7 +198,9 @@ def getBloodRequests():
         username = username,
         requests = requests
     )
-
+@app.route('/form')
+def form():
+    return render_template("form.html")
 
 if __name__=='__main__':
     app.run(host="0.0.0.0",debug = True)

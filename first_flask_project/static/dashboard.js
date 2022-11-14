@@ -1,5 +1,5 @@
 function functio()
-{
+{  
     var username = document.getElementById("username").value;
     var role = document.getElementById("role").value;
     if(role=="USER")
@@ -8,6 +8,7 @@ function functio()
     {
       role="USER"
     }
+    console.log(username)
     var data =
         {"username":username,
         "role":role}
@@ -19,7 +20,7 @@ $.ajax(
 'Content-Type': 'application/x-www-form-urlencoded'
 },
 
-    url:"http://100.127.73.5:5000/toggle",
+    url:"http://127.0.0.1:5000/toggle",
     data:JSON.stringify(data),
     
     ContentType:'application/json',
@@ -42,7 +43,8 @@ var tablend = "	</tbody></table></div>"
 
 
 function myhistory()
-{
+{    var loading = " <span class='loader'></span>"
+     document.getElementsByClassName("content")[0].innerHTML = loading;
     var username = document.getElementById("username").value;
 
     var data =
@@ -74,11 +76,77 @@ $.ajax(
 )
 
 }
-var header = document.getElementsByClassName("side-bar");
-var btns = header.getElementById("a");
-for (var i = 0; i < btns.length; i++) {
-btns.addEventListener("click", function() {
-    var current = document.getElementsByClassName("active");
-    current[0].className = current[0].className.replace(" active", "");
-    this.className += " active";
-    });}
+
+
+function home()
+{ 
+    var home1="<H2>Available donors</H2> <div class='row1-container'> <div class='box  cyan'> <h2>Suresh</h2> <p>Blood : O+ <br>Location Chennai<br>Contact 982376312</p> </div> <div class='box red'> <h2>Sarath</h2> <p>Blood : B- <br>Location Chennai<br>Contact 992376312</p> </div> <div class='box blue'> <h2>Kevin</h2> <p>Blood : A- <br>Location Kerala<br>Contact 982376312</p> </div> <div class='box orange'> <h2>Suresh</h2> <p>Blood : A+ <br>Location Chennai<br>Contact 982376312</p> </div> </div> <div class='row1-container'> <div class='box orange'> <h2>Suresh</h2> <p>Blood : A+ <br>Location Chennai<br>Contact 982376312</p> </div> <div class='box red'> <h2>Harish</h2> <p>Blood : AB+ <br>Location Kolkata<br>Contact 977237631</p> </div> <div class='box blue'> <h2>Vikram</h2> <p>Blood : O- <br>Location Mumbai<br>Contact 682376356</p> </div> <div class='box  cyan'> <h2>Suresh</h2> <p>Blood : O+ <br>Location Chennai<br>Contact 982376312</p> </div> </div> </div>"
+
+    document.getElementsByClassName("content")[0].innerHTML = home1;
+    console.log("ho") 
+}    
+
+function request()
+{ 
+   
+    $.ajax({
+        url:"/form",
+        success:function(response){
+           $('.content').html(response);
+        },error:function(){
+           alert("error");
+        }
+     });
+    
+   
+}  
+
+function sendrequest()
+{   
+    var loading = " <span class='loader'></span>"
+  
+    var username = document.getElementById("username").value;
+    var name = document.getElementById("name").value;
+    var sex = document.getElementById("sex").value;
+    var blood = document.getElementById("blood").value;
+    var age = document.getElementById("age").value;
+    var phno = document.getElementById("phno").value;
+    document.getElementsByClassName("content")[0].innerHTML = loading;
+    console.log(name)
+    var data =
+    {"username":username,
+    "name":name,
+     "sex":sex,
+     "age":age,
+    "blood":blood,
+     "phno":phno}
+     console.log(age)
+
+$.ajax(  
+{   contentType: 'application/json;charset=UTF-8',  
+type:'POST',  
+headers: {  
+'Content-Type': 'application/x-www-form-urlencoded'  
+},  
+  
+url:"http://127.0.0.1:5000/requestPlasma",  
+data:JSON.stringify(data),  
+  
+ContentType:'application/json',  
+success:function(result)  
+{  
+console.log(result['status'])
+var res ="<div class='alert alert-success'><strong>Success!</strong> Your Request has been forwarded.</div>";  
+$('.content').html(res)
+}  
+}  
+)  
+
+
+}
+
+
+
+
+
+
