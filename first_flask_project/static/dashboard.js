@@ -100,6 +100,7 @@ function request()
     
    
 }  
+// Log out
 
 function sendrequest()
 {   

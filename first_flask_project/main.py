@@ -122,7 +122,7 @@ def toggle_user():
     )
 
 
-@app.route('/requestPalsma', methods=['POST'])
+@app.route('/requestPlasma', methods=['POST'])
 def requestBloodPlasma():
     #fetch mail address of the donors
     data =  request.get_json(force=True) 
