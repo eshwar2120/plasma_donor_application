@@ -4,6 +4,11 @@ import os
 import ibm_db
 from flask import request
 import json
+
+from flask import (Flask, jsonify, make_response, redirect, render_template,
+                   request, url_for)
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 conn = ibm_db.connect("DATABASE=bludb;HOSTNAME=764264db-9824-4b7c-82df-40d1b13897c2.bs2io90l08kqb1od8lcg.databases.appdomain.cloud;PORT=32536;SECURITY=SSL;SSLServerCertificate=abc.crt;UID=gnq12618;PWD=0glS4tFaR2ciK8fB",'','')
 print(conn)
 print("connection successful...")
