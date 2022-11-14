@@ -1,7 +1,11 @@
-from flask import Flask, redirect, url_for, render_template, request, make_response, jsonify, request
-import ibm_db
-from flask import request
 import json
+import os
+
+import ibm_db
+from flask import (Flask, jsonify, make_response, redirect, render_template,
+                   request, url_for)
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 
 conn = ibm_db.connect(
     "DATABASE=bludb;HOSTNAME=764264db-9824-4b7c-82df-40d1b13897c2.bs2io90l08kqb1od8lcg.databases.appdomain.cloud;PORT=32536;SECURITY=SSL;SSLServerCertificate=abc.crt;UID=gnq12618;PWD=0glS4tFaR2ciK8fB",
@@ -9,9 +13,8 @@ conn = ibm_db.connect(
 print(conn)
 print("connection successful...")
 app = Flask(__name__)
-import os
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
+
+
 
 
 @app.route('/')
@@ -26,7 +29,7 @@ def dash():
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
-    if request.method == 'POST':
+    if request.method=='POST':
         username = request.form['username']
         password = request.form['password']
         sql = "select * from user where username=? and password=?"
@@ -60,9 +63,9 @@ def login():
 
 
         else:
-            return redirect(url_for('login'))
+            return render_template('login.html')
         return redirect(url_for('home'))
-    elif request.method == 'GET':
+    elif request.method=='GET':
         return render_template('login.html')
 
 
@@ -116,41 +119,21 @@ def toggle_user():
 
 @app.route('/requestPalsma', methods=['POST'])
 def requestBloodPlasma():
-    # fetch mail address of the donors
-    data = request.get_json(force=True)
-    username = data['username']
-    name = data['name']
-    age = data['age']
-    sex = data['sex']
-    blood_type = data['bloodtype']
-    phone_number = data['phone_num']
+    #fetch mail address of the donors
+    username = request.form['username']
+    name = request.form['name']
+    age = request.form['age']
+    sex = request.form['sex']
+    blood_type = request.form['bloodtype']
     sql = "select email from user where blood_group=?"
     stmt = ibm_db.prepare(conn, sql)
     ibm_db.bind_param(stmt, 1, blood_type)
     ibm_db.execute(stmt)
     dic = ibm_db.fetch_assoc(stmt)
-    email_list = []
-    while dic != False:
-        email_list.append(dic['EMAIL'])
-        print(dic['EMAIL'])
-        dic = ibm_db.fetch_assoc(stmt)
-    # send mail
-
-    message = Mail(
-        from_email='eshwaran.s.2019.cse@rajalakshmi.edu.in',
-        to_emails=email_list,
-        subject='Sending with Twilio SendGrid is Fun',
-        html_content='<h1>Need Of Blood</h1><table><tr><th>Name</th><th>' + name + '</th></tr><tr><th>Age</th><th>' + age + '</th></tr><tr><th>Sex</th><th>' + sex + '</th></tr><tr><th>Blood Group</th><th>' + blood_type + '</th></tr><tr><th>Phone Number</th><th>' + phone_number + '</th></tr></table>'
-    )
-    try:
-        sg = SendGridAPIClient("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")
-        response = sg.send(message)
-        print(response.status_code)
-        print(response.body)
-        print(response.headers)
-    except Exception as e:
-        print(e.message)
-    # insert data into requests table
+    while dic!=False:
+        print(dic['email'])
+    #send mail
+    #insert data into requests table
     sql = "insert into bloodrequests(username,name,age,sex,blood_type) values (?,?,?,?,?)"
     prep_stmt = ibm_db.prepare(conn, sql)
     ibm_db.bind_param(prep_stmt, 1, username)
@@ -171,15 +154,14 @@ def requestBloodPlasma():
 
 @app.route('/getrequests', methods=['POST'])
 def getBloodRequests():
-    data = request.get_json(force=True)
-    username = data['username']
+    username = request.form['username']
     sql = "select * from bloodrequests where username=?"
     stmt = ibm_db.prepare(conn, sql)
     ibm_db.bind_param(stmt, 1, username)
     ibm_db.execute(stmt)
     dic = ibm_db.fetch_assoc(stmt)
     requests = []
-    print(type(dic))
+    print(dic)
     while dic != False:
         single_request = {
             'name': dic['NAME'],
@@ -194,7 +176,9 @@ def getBloodRequests():
         username=username,
         requests=requests
     )
-
+@app.route('/form')
+def form():
+    return render_template("form.html")
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", debug=True)
