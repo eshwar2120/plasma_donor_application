@@ -2,8 +2,10 @@ import json
 import os
 
 import ibm_db
-from flask import request
-import json
+from flask import (Flask, jsonify, make_response, redirect, render_template,
+                   request, url_for)
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 
 from flask import (Flask, jsonify, make_response, redirect, render_template,
                    request, url_for)
