@@ -154,12 +154,12 @@ def requestBloodPlasma():
     )
     try:
         sg = SendGridAPIClient("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")
-        response = sg.send(message)
+        response = sg.send(message=message)
         print(response.status_code)
         print(response.body)
         print(response.headers)
     except Exception as e:
-        print(e.message)
+        print(e)
     # insert data into requests table
     #insert data into requests table
     sql = "insert into bloodrequests(username,name,age,sex,blood_type) values (?,?,?,?,?)"
